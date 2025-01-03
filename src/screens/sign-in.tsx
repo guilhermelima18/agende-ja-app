@@ -18,11 +18,15 @@ export function SignIn() {
     formState: { errors, isSubmitting },
   } = useForm<SignInType>({
     resolver: zodResolver(signInSchema),
+    mode: "onChange",
   });
 
   const { navigate } = useNavigation<AppNavigationRoutes>();
 
-  async function onSignIn(data: SignInType) {}
+  async function onSignIn(data: SignInType) {
+    console.log(data);
+    navigate("home");
+  }
 
   return (
     <Layout>
@@ -40,12 +44,13 @@ export function SignIn() {
                 control={control}
                 render={({ field: { value, onChange } }) => (
                   <TextInput
+                    autoCapitalize="none"
                     keyboardType="email-address"
                     mode="outlined"
                     label="E-mail"
                     placeholder="Digite seu e-mail"
                     value={value}
-                    onChange={onChange}
+                    onChangeText={onChange}
                   />
                 )}
               />
@@ -73,7 +78,7 @@ export function SignIn() {
                       />
                     }
                     value={value}
-                    onChange={onChange}
+                    onChangeText={onChange}
                   />
                 )}
               />
