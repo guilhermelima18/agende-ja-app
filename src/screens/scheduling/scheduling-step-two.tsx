@@ -1,7 +1,11 @@
-import { View, Text, ScrollView, Image } from "react-native";
+import { useEffect, useMemo } from "react";
+import { View, Text, ScrollView, Image, Alert } from "react-native";
 import { Button } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useFormContext } from "react-hook-form";
+
+import { useUser } from "@/contexts/user";
+import { useServices } from "@/hooks/use-services";
 
 import { Layout } from "@/components/layout";
 import { Select } from "@/components/select";
@@ -9,14 +13,46 @@ import { StepProgress } from "@/components/step-progress";
 
 import { AppNavigationRoutes } from "@/@types/app-navigation";
 
+type RouteParams = {
+  professionalId: string;
+};
+
 export function SchedulingStepTwo() {
   const { control, handleSubmit } = useFormContext();
-
   const { navigate } = useNavigation<AppNavigationRoutes>();
+  const { params } = useRoute();
+  const { userLogged } = useUser();
+  const { services, getServices } = useServices();
 
-  function onSubmitStepTwo() {
+  const { professionalId } = params as RouteParams;
+
+  const servicesSelectAdapter = useMemo(() => {
+    if (!!services?.length && services?.length > 0) {
+      return services.map((service) => ({
+        label: `${service.name} - R$ ${service.price}`,
+        value: service.id,
+      }));
+    }
+
+    return [];
+  }, [services]);
+
+  function onSubmitStepTwo(data: any) {
+    if (!data.service) {
+      return Alert.alert("Atenção!", "Selecione um serviço.");
+    }
+
     navigate("scheduling-step-three");
   }
+
+  useEffect(() => {
+    if (professionalId && userLogged?.companyId) {
+      getServices({
+        companyId: userLogged?.companyId,
+        professionalId,
+      });
+    }
+  }, [professionalId, userLogged?.companyId]);
 
   return (
     <Layout>
@@ -36,11 +72,7 @@ export function SchedulingStepTwo() {
             <Select
               name="service"
               control={control}
-              options={[
-                { label: "Teste", value: "teste" },
-                { label: "Teste2", value: "teste2" },
-                { label: "Teste3", value: "teste3" },
-              ]}
+              options={servicesSelectAdapter}
               placeholder="Selecione um serviço"
             />
 

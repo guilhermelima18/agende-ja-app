@@ -11,6 +11,7 @@ import { Home } from "@/screens/home";
 import { SchedulingStepOne } from "@/screens/scheduling/scheduling-step-one";
 import { SchedulingStepTwo } from "@/screens/scheduling/scheduling-step-two";
 import { SchedulingStepThree } from "@/screens/scheduling/scheduling-step-three";
+import { Contexts } from "@/contexts";
 
 const Stack = createStackNavigator();
 
@@ -22,29 +23,31 @@ export default function App() {
       <NavigationContainer>
         <PaperProvider>
           <StatusBar style="auto" />
-          <FormProvider {...methods}>
-            <Stack.Navigator
-              initialRouteName="sign-in"
-              screenOptions={{ headerShown: false }}
-            >
-              <Stack.Screen name="sign-in" component={SignIn} />
-              <Stack.Screen name="user-register" component={UserRegister} />
-              <Stack.Screen name="home" component={Home} />
+          <Contexts>
+            <FormProvider {...methods}>
+              <Stack.Navigator
+                initialRouteName="sign-in"
+                screenOptions={{ headerShown: false }}
+              >
+                <Stack.Screen name="sign-in" component={SignIn} />
+                <Stack.Screen name="user-register" component={UserRegister} />
+                <Stack.Screen name="home" component={Home} />
 
-              <Stack.Screen
-                name="scheduling-step-one"
-                component={SchedulingStepOne}
-              />
-              <Stack.Screen
-                name="scheduling-step-two"
-                component={SchedulingStepTwo}
-              />
-              <Stack.Screen
-                name="scheduling-step-three"
-                component={SchedulingStepThree}
-              />
-            </Stack.Navigator>
-          </FormProvider>
+                <Stack.Screen
+                  name="scheduling-step-one"
+                  component={SchedulingStepOne}
+                />
+                <Stack.Screen
+                  name="scheduling-step-two"
+                  component={SchedulingStepTwo}
+                />
+                <Stack.Screen
+                  name="scheduling-step-three"
+                  component={SchedulingStepThree}
+                />
+              </Stack.Navigator>
+            </FormProvider>
+          </Contexts>
         </PaperProvider>
       </NavigationContainer>
     </SafeAreaProvider>

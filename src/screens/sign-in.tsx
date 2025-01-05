@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { View, Image, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Button, TextInput } from "react-native-paper";
+import { Button, TextInput, ActivityIndicator } from "react-native-paper";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { useSignIn } from "@/hooks/use-sign-in";
 import { Layout } from "@/components/layout";
 import { AppNavigationRoutes } from "@/@types/app-navigation";
 import { signInSchema, SignInType } from "@/validations/sign-in";
@@ -23,9 +24,17 @@ export function SignIn() {
 
   const { navigate } = useNavigation<AppNavigationRoutes>();
 
-  async function onSignIn(data: SignInType) {
-    console.log(data);
-    navigate("home");
+  const { onSignIn } = useSignIn();
+
+  async function handleSignIn(data: SignInType) {
+    const response = await onSignIn({
+      email: data.email,
+      password: data.password,
+    });
+
+    if (response && response.status === 200) {
+      navigate("home");
+    }
   }
 
   return (
@@ -94,9 +103,13 @@ export function SignIn() {
             <Button
               mode="contained"
               disabled={isSubmitting}
-              onPress={handleSubmit(onSignIn)}
+              onPress={handleSubmit(handleSignIn)}
             >
-              Entrar
+              {isSubmitting ? (
+                <ActivityIndicator animating color="#fff" />
+              ) : (
+                "Entrar"
+              )}
             </Button>
             <Button
               mode="outlined"

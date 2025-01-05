@@ -1,7 +1,11 @@
-import { View, Text, Image, ScrollView } from "react-native";
+import { useEffect, useMemo } from "react";
+import { View, Text, Image, ScrollView, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Button } from "react-native-paper";
 import { useFormContext } from "react-hook-form";
+
+import { useUser } from "@/contexts/user";
+import { useProfessionals } from "@/hooks/use-professionals";
 
 import { Layout } from "@/components/layout";
 import { Select } from "@/components/select";
@@ -11,12 +15,40 @@ import { AppNavigationRoutes } from "@/@types/app-navigation";
 
 export function SchedulingStepOne() {
   const { control, handleSubmit } = useFormContext();
-
   const { navigate } = useNavigation<AppNavigationRoutes>();
+  const { userLogged } = useUser();
+  const { professionals, getProfessionals } = useProfessionals();
 
-  function onSubmitStepOne() {
-    navigate("scheduling-step-two");
+  console.log({ professionals });
+
+  const professionalsSelectAdapter = useMemo(() => {
+    if (!!professionals?.length && professionals?.length > 0) {
+      return professionals.map((professional) => ({
+        label: professional.name,
+        value: professional.id,
+      }));
+    }
+
+    return [];
+  }, [professionals]);
+
+  function onSubmitStepOne(data: any) {
+    if (!data.professional) {
+      return Alert.alert("Atenção!", "Selecione um profissional.");
+    }
+
+    navigate("scheduling-step-two", {
+      professionalId: data.professional,
+    });
   }
+
+  useEffect(() => {
+    if (userLogged?.companyId) {
+      getProfessionals({
+        companyId: userLogged?.companyId,
+      });
+    }
+  }, [userLogged?.companyId]);
 
   return (
     <Layout>
@@ -36,11 +68,7 @@ export function SchedulingStepOne() {
             <Select
               name="professional"
               control={control}
-              options={[
-                { label: "Teste", value: "teste" },
-                { label: "Teste2", value: "teste2" },
-                { label: "Teste3", value: "teste3" },
-              ]}
+              options={professionalsSelectAdapter}
               placeholder="Selecione um profissional"
             />
 

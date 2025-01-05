@@ -7,7 +7,7 @@ type StepProgressProps = {
 export function StepProgress({ progress }: StepProgressProps) {
   return (
     <View className="w-full">
-      <View style={{ width: `${progress}%` }} className={`bg-purple-500 h-2`} />
+      <View style={{ width: `${progress}%` }} className={`bg-purple-800 h-2`} />
     </View>
   );
 }
