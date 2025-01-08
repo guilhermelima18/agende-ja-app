@@ -42,7 +42,9 @@ export function SchedulingStepTwo() {
       return Alert.alert("Atenção!", "Selecione um serviço.");
     }
 
-    navigate("scheduling-step-three");
+    navigate("scheduling-step-three", {
+      professionalId,
+    });
   }
 
   useEffect(() => {

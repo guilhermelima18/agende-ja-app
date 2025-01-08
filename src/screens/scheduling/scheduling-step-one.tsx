@@ -19,8 +19,6 @@ export function SchedulingStepOne() {
   const { userLogged } = useUser();
   const { professionals, getProfessionals } = useProfessionals();
 
-  console.log({ professionals });
-
   const professionalsSelectAdapter = useMemo(() => {
     if (!!professionals?.length && professionals?.length > 0) {
       return professionals.map((professional) => ({

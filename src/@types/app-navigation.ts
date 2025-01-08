@@ -8,7 +8,9 @@ export type AppNavigation = {
   ["scheduling-step-two"]: {
     professionalId: string;
   };
-  ["scheduling-step-three"]: undefined;
+  ["scheduling-step-three"]: {
+    professionalId: string;
+  };
 };
 
 export type AppNavigationRoutes = NativeStackNavigationProp<AppNavigation>;
