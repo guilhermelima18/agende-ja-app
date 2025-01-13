@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { View, Text, Image, ScrollView, Alert } from "react-native";
-import { Button } from "react-native-paper";
+import { ActivityIndicator, Button } from "react-native-paper";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Controller, useFormContext } from "react-hook-form";
 import { Calendar } from "react-native-calendars";
@@ -15,6 +15,7 @@ import { StepProgress } from "@/components/step-progress";
 import { formatDate, formatHour, getTodayDate } from "@/helpers/functions";
 import { AppNavigationRoutes } from "@/@types/app-navigation";
 import { schedulingHours } from "@/helpers/constants";
+import { removeUserStorage } from "@/hooks/use-storage";
 
 type RouteParams = {
   professionalId: string;
@@ -25,11 +26,16 @@ export function SchedulingStepThree() {
 
   const [dateSelected, setDateSelected] = useState(today);
 
-  const { control, handleSubmit } = useFormContext();
-  const { navigate } = useNavigation<AppNavigationRoutes>();
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = useFormContext();
+  const { navigate, reset } = useNavigation<AppNavigationRoutes>();
   const { params } = useRoute();
   const { userLogged } = useUser();
-  const { appointments, getAppointments } = useAppointments();
+  const { appointments, getAppointments, createAppointment } =
+    useAppointments();
 
   const { professionalId } = params as RouteParams;
 
@@ -41,36 +47,30 @@ export function SchedulingStepThree() {
     return [];
   }, [appointments]);
 
-  const disabledDates =
-    !!disabledDatesArray?.length &&
-    disabledDatesArray?.length > 0 &&
-    disabledDatesArray.reduce((acc: any, date) => {
-      const formattedDate = formatDate(date);
-      acc[formattedDate] = {
-        disabled: true,
-        disableTouchEvent: true,
-        selectedColor: "orange",
-      };
-      return acc;
-    }, {});
-
   const hoursSelectAdapter = useMemo(() => {
     if (!!disabledDatesArray?.length && disabledDatesArray?.length > 0) {
       const disabledHours = disabledDatesArray.map((date) => {
-        return formatHour(date);
+        return {
+          date: formatDate(date),
+          hour: formatHour(date),
+        };
       });
 
-      const filteredSchedulingHours = schedulingHours.filter(
-        (hour) => !disabledHours.includes(hour.value)
+      const scheduledHoursForDate = disabledHours
+        .filter((item) => item.date === dateSelected)
+        .map((item) => item.hour);
+
+      const availableHours = schedulingHours.filter(
+        (hour) => !scheduledHoursForDate.includes(hour.value)
       );
 
-      return filteredSchedulingHours;
+      return availableHours;
     }
 
     return [];
-  }, [disabledDatesArray]);
+  }, [disabledDatesArray, dateSelected]);
 
-  function onSubmitStepThree(data: any) {
+  async function onSubmitStepThree(data: any) {
     if (!data.hour) {
       return Alert.alert("Atenção!", "Selecione um horário.");
     }
@@ -81,12 +81,26 @@ export function SchedulingStepThree() {
     );
     const dateAndHourISOString = dateObject.toISOString();
 
-    const values = {
-      ...data,
-      date: data.date ? data.date : today,
-    };
+    const response = await createAppointment({
+      professionalId,
+      serviceId: data.service,
+      userId: userLogged.id,
+      companyId: userLogged.companyId,
+      scheduledAt: dateAndHourISOString,
+      status: "PENDING",
+    });
 
-    console.log(values);
+    if (response && response?.status === 201) {
+      Alert.alert("Sucesso", "Seu horário foi agendado!", [
+        {
+          text: "OK",
+          onPress: async () => {
+            await removeUserStorage();
+            reset({ routes: [{ name: "sign-in" }] });
+          },
+        },
+      ]);
+    }
   }
 
   useEffect(() => {
@@ -126,7 +140,6 @@ export function SchedulingStepThree() {
                     }}
                     current={dateSelected}
                     markedDates={{
-                      ...disabledDates,
                       [dateSelected]: {
                         selected: true,
                         disableTouchEvent: true,
@@ -152,9 +165,14 @@ export function SchedulingStepThree() {
             <Button
               mode="contained"
               className="mt-4"
+              disabled={isSubmitting}
               onPress={handleSubmit(onSubmitStepThree)}
             >
-              Finalizar agendamento
+              {isSubmitting ? (
+                <ActivityIndicator animating color="#fff" />
+              ) : (
+                "Finalizar agendamento"
+              )}
             </Button>
           </View>
         </View>

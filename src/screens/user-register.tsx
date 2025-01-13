@@ -1,10 +1,16 @@
-import { View, Image, Text, ScrollView } from "react-native";
+import { useEffect, useMemo } from "react";
+import { View, Image, Text, ScrollView, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Button, TextInput } from "react-native-paper";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { useUsers } from "@/hooks/use-users";
+import { useCompanies } from "@/hooks/use-companies";
+
 import { Layout } from "@/components/layout";
+import { Select } from "@/components/select";
+
 import { dateMask, phoneMask } from "@/helpers/masks";
 import {
   userRegisterSchema,
@@ -23,12 +29,48 @@ export function UserRegister() {
   });
 
   const { navigate } = useNavigation<AppNavigationRoutes>();
+  const { createUser } = useUsers();
+  const { companies, getCompanies } = useCompanies();
+
+  const companiesAdapterSelect = useMemo(() => {
+    if (!!companies?.length && companies?.length > 0) {
+      return companies.map((company) => ({
+        label: company.name,
+        value: company.id,
+      }));
+    }
+
+    return [];
+  }, [companies]);
 
   async function onRegister(data: UserRegisterType) {
-    console.log(data);
+    const values = {
+      role: "user" as "admin" | "user",
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      dateOfBirth: data.dateOfBirth?.split("/").reverse().join("-"),
+      phoneNumber: data.phone?.replace(/\D/g, ""),
+      companyId: data.company,
+    };
 
-    navigate("sign-in");
+    const response = await createUser(values);
+
+    if (response && response.status === 201) {
+      Alert.alert("Sucesso", "Usuário cadastrado!", [
+        {
+          text: "OK",
+          onPress: async () => {
+            navigate("sign-in");
+          },
+        },
+      ]);
+    }
   }
+
+  useEffect(() => {
+    getCompanies();
+  }, []);
 
   return (
     <Layout>
@@ -152,6 +194,20 @@ export function UserRegister() {
                   </Text>
                 )}
               </View>
+            </View>
+
+            <View>
+              <Select
+                name="company"
+                control={control}
+                options={companiesAdapterSelect}
+                placeholder="Selecione um estabelecimento"
+              />
+              {errors.company?.message && (
+                <Text className="text-red-500 text-xs mt-1">
+                  {errors.company?.message}
+                </Text>
+              )}
             </View>
 
             <View>

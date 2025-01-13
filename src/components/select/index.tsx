@@ -33,7 +33,7 @@ export function Select({
         render={({ field: { value, onChange } }) => (
           <>
             <TouchableOpacity
-              className="w-full border border-gray-300 h-14 flex-row items-center justify-between p-4 rounded-md"
+              className="w-full border border-gray-500 h-14 flex-row items-center justify-between p-4 rounded-md"
               onPress={() => setModalIsOpen(!modalIsOpen)}
             >
               <Text>

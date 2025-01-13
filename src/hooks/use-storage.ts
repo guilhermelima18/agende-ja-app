@@ -9,3 +9,7 @@ export async function getUserStorage() {
 
   return null;
 }
+
+export async function removeUserStorage() {
+  await AsyncStorage.removeItem("@agende-ja:user");
+}

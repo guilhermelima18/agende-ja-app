@@ -16,6 +16,9 @@ const userRegisterSchema = z.object({
   dateOfBirth: z
     .string({ required_error: "Campo obrigatório" })
     .min(10, "Data inválida"),
+  company: z
+    .string({ required_error: "Campo obrigatório" })
+    .min(1, "Campo obrigatório"),
 });
 
 type UserRegisterType = z.infer<typeof userRegisterSchema>;
