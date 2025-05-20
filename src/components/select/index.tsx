@@ -26,7 +26,7 @@ export function Select({
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   return (
-    <View className="w-full mb-4 mt-1">
+    <View className="w-full mt-1">
       <Controller
         name={name}
         control={control}

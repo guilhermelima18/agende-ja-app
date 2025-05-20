@@ -4,6 +4,7 @@ export type AppNavigation = {
   ["sign-in"]: undefined;
   ["user-register"]: undefined;
   ["home"]: undefined;
+  ["appointments"]: undefined;
   ["scheduling-step-one"]: undefined;
   ["scheduling-step-two"]: {
     professionalId: string;

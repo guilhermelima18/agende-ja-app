@@ -3,11 +3,14 @@ import { useNavigation } from "@react-navigation/native";
 import { Button } from "react-native-paper";
 import { CalendarCheck } from "lucide-react-native";
 
+import { useUserContext } from "@/contexts/user";
+
 import { Layout } from "@/components/layout";
 import { AppNavigationRoutes } from "@/@types/app-navigation";
 
 export function Home() {
   const { navigate } = useNavigation<AppNavigationRoutes>();
+  const { userLogged } = useUserContext();
 
   return (
     <Layout>
@@ -17,15 +20,26 @@ export function Home() {
           source={require("../assets/icons/logo-agende-ja.png")}
         />
 
-        <Button
-          mode="contained"
-          onPress={() => navigate("scheduling-step-one")}
-        >
-          <View className="flex-row items-center justify-center gap-1">
-            <CalendarCheck color="#fff" size={20} />
-            <Text className="text-white">Agende seu horário</Text>
-          </View>
-        </Button>
+        {userLogged && userLogged?.role === "admin" && (
+          <Button mode="contained" onPress={() => navigate("appointments")}>
+            <View className="flex-row items-center justify-center gap-1">
+              <CalendarCheck color="#fff" size={20} />
+              <Text className="text-white">Ver horários</Text>
+            </View>
+          </Button>
+        )}
+
+        {userLogged && userLogged?.role === "user" && (
+          <Button
+            mode="contained"
+            onPress={() => navigate("scheduling-step-one")}
+          >
+            <View className="flex-row items-center justify-center gap-1">
+              <CalendarCheck color="#fff" size={20} />
+              <Text className="text-white">Agende seu horário</Text>
+            </View>
+          </Button>
+        )}
       </View>
     </Layout>
   );

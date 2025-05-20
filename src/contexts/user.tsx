@@ -1,6 +1,7 @@
 import {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -30,19 +31,22 @@ export const UserContext = createContext({} as UserContextProps);
 export function UserProvider({ children }: UserProviderProps) {
   const [userLogged, setUserLogged] = useState<UserProps>({} as UserProps);
 
+  const userStorage = useCallback(async () => {
+    const result = await getUserStorage();
+
+    setUserLogged({
+      id: result.data.id,
+      name: result.data.name,
+      email: result.data.email,
+      dateOfBirth: result.data.dateOfBirth,
+      phoneNumber: result.data.phoneNumber,
+      role: result.data.role,
+      companyId: result.data.companyId,
+    });
+  }, []);
+
   useEffect(() => {
-    (async () => {
-      const user = await getUserStorage();
-      setUserLogged({
-        id: user.data.id,
-        name: user.data.name,
-        email: user.data.email,
-        dateOfBirth: user.data.dateOfBirth,
-        phoneNumber: user.data.phoneNumber,
-        role: user.data.role,
-        companyId: user.data.companyId,
-      });
-    })();
+    userStorage();
   }, []);
 
   return (
@@ -56,4 +60,4 @@ export function UserProvider({ children }: UserProviderProps) {
   );
 }
 
-export const useUser = () => useContext(UserContext);
+export const useUserContext = () => useContext(UserContext);

@@ -18,6 +18,8 @@ export function useCompanies() {
     try {
       const response = await api.get("/companies");
 
+      console.log(response.data);
+
       if (response) {
         setCompanies(response.data.data);
       }

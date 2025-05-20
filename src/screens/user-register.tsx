@@ -196,7 +196,7 @@ export function UserRegister() {
               </View>
             </View>
 
-            <View>
+            <View style={{ marginBottom: 20 }}>
               <Select
                 name="company"
                 control={control}
