@@ -1,18 +1,29 @@
-import { useState } from "react";
-import { View, Image, Text } from "react-native";
+import {
+  View,
+  Image,
+  Text,
+  ActivityIndicator,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Button, TextInput, ActivityIndicator } from "react-native-paper";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { LogIn } from "lucide-react-native";
 
 import { useSignIn } from "@/hooks/use-sign-in";
+
 import { Layout } from "@/components/layout";
+import { Input } from "@/components/input";
+import { Button } from "@/components/button";
+
 import { AppNavigationRoutes } from "@/@types/app-navigation";
 import { signInSchema, SignInType } from "@/validations/sign-in";
 
-export function SignIn() {
-  const [showPassword, setShowPassword] = useState(false);
+import { theme } from "@/styles/theme";
 
+export function SignIn() {
   const {
     control,
     handleSubmit,
@@ -22,7 +33,7 @@ export function SignIn() {
     mode: "onChange",
   });
 
-  const { navigate } = useNavigation<AppNavigationRoutes>();
+  const navigation = useNavigation<AppNavigationRoutes>();
 
   const { onSignIn } = useSignIn();
 
@@ -33,94 +44,162 @@ export function SignIn() {
     });
 
     if (response && response.status === 200) {
-      navigate("home");
+      navigation.push("home");
     }
   }
 
   return (
     <Layout>
-      <View className="w-full flex-1 flex-col items-center mt-40">
-        <Image
-          className="w-40 h-40 mb-4"
-          source={require("../assets/icons/logo-agende-ja.png")}
-        />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"} // Ajuste conforme o sistema operacional
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1 }}
+          style={{
+            width: "100%",
+            flex: 1,
+          }}
+        >
+          <View
+            style={{
+              width: "100%",
+              flex: 1,
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Image
+              style={{
+                width: 140,
+                height: 140,
+                marginBottom: 4,
+              }}
+              source={require("../assets/icons/logo-agende-ja.png")}
+            />
 
-        <View className="w-full">
-          <View className="flex-col gap-2 mb-4">
-            <View>
-              <Controller
-                name="email"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <TextInput
-                    autoCapitalize="none"
-                    keyboardType="email-address"
-                    mode="outlined"
-                    label="E-mail"
-                    placeholder="Digite seu e-mail"
-                    value={value}
-                    onChangeText={onChange}
-                  />
-                )}
-              />
-              {errors.email?.message && (
-                <Text className="text-red-500 text-xs mt-1">
-                  {errors.email?.message}
-                </Text>
-              )}
-            </View>
-
-            <View>
-              <Controller
-                name="password"
-                control={control}
-                render={({ field: { value, onChange } }) => (
-                  <TextInput
-                    mode="outlined"
-                    label="Senha"
-                    placeholder="Digite sua senha"
-                    secureTextEntry={!showPassword}
-                    right={
-                      <TextInput.Icon
-                        icon={showPassword ? "eye-off-outline" : "eye-outline"}
-                        onPress={() => setShowPassword(!showPassword)}
+            <View style={{ width: "100%" }}>
+              <View
+                style={{ flexDirection: "column", gap: 20, marginBottom: 4 }}
+              >
+                <View style={{ flexDirection: "column" }}>
+                  <Text
+                    style={{
+                      fontSize: theme.fontSizes.md,
+                      fontWeight: "600",
+                      marginBottom: 2,
+                    }}
+                  >
+                    E-mail
+                  </Text>
+                  <Controller
+                    name="email"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <Input
+                        autoCapitalize="none"
+                        keyboardType="email-address"
+                        placeholder="Digite seu e-mail"
+                        value={value}
+                        onChangeText={onChange}
                       />
-                    }
-                    value={value}
-                    onChangeText={onChange}
+                    )}
                   />
-                )}
-              />
-              {errors.password?.message && (
-                <Text className="text-red-500 text-xs mt-1">
-                  {errors.password?.message}
-                </Text>
-              )}
+                  {errors.email?.message && (
+                    <Text
+                      style={{
+                        color: theme.colors.red[500],
+                        fontSize: theme.fontSizes.xs,
+                        marginTop: 2,
+                      }}
+                    >
+                      {errors.email?.message}
+                    </Text>
+                  )}
+                </View>
+
+                <View style={{ flexDirection: "column" }}>
+                  <Text
+                    style={{
+                      fontSize: theme.fontSizes.md,
+                      fontWeight: "600",
+                      marginBottom: 2,
+                    }}
+                  >
+                    Senha
+                  </Text>
+                  <Controller
+                    name="password"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <Input
+                        placeholder="Digite sua senha"
+                        secureTextEntry
+                        value={value}
+                        onChangeText={onChange}
+                      />
+                    )}
+                  />
+                  {errors.password?.message && (
+                    <Text
+                      style={{
+                        color: theme.colors.red[500],
+                        fontSize: theme.fontSizes.xs,
+                        marginTop: 2,
+                      }}
+                    >
+                      {errors.password?.message}
+                    </Text>
+                  )}
+                </View>
+              </View>
+
+              <View style={{ flexDirection: "column", gap: 10, marginTop: 20 }}>
+                <Button
+                  disabled={isSubmitting}
+                  onPress={handleSubmit(handleSignIn)}
+                >
+                  {isSubmitting ? (
+                    <ActivityIndicator animating color="#fff" />
+                  ) : (
+                    <View style={{ flexDirection: "row", gap: 4 }}>
+                      <Text
+                        style={{
+                          color: theme.colors.white,
+                          fontWeight: "600",
+                          fontSize: theme.fontSizes.md,
+                        }}
+                      >
+                        Entrar
+                      </Text>
+                      <LogIn color={theme.colors.white} />
+                    </View>
+                  )}
+                </Button>
+
+                <Button
+                  backgroundColor={theme.colors.red[500]}
+                  disabled={isSubmitting}
+                  onPress={() => navigation.push("user-register")}
+                >
+                  <Text
+                    style={{
+                      color: theme.colors.white,
+                      fontWeight: "600",
+                      fontSize: theme.fontSizes.md,
+                    }}
+                  >
+                    Cadastrar-se
+                  </Text>
+                </Button>
+              </View>
             </View>
           </View>
-
-          <View className="flex-col gap-4">
-            <Button
-              mode="contained"
-              disabled={isSubmitting}
-              onPress={handleSubmit(handleSignIn)}
-            >
-              {isSubmitting ? (
-                <ActivityIndicator animating color="#fff" />
-              ) : (
-                "Entrar"
-              )}
-            </Button>
-            <Button
-              mode="outlined"
-              disabled={isSubmitting}
-              onPress={() => navigate("user-register")}
-            >
-              Cadastrar-se
-            </Button>
-          </View>
-        </View>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </Layout>
   );
 }

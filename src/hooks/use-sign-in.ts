@@ -3,6 +3,7 @@ import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { api } from "@/libs/axios";
+import { useUserContext } from "@/contexts/user";
 
 type SignInBody = {
   email: string;
@@ -10,6 +11,8 @@ type SignInBody = {
 };
 
 export function useSignIn() {
+  const { setUserLogged } = useUserContext();
+
   const onSignIn = useCallback(async ({ email, password }: SignInBody) => {
     try {
       const response = await api.post("/sign-in", {
@@ -18,6 +21,16 @@ export function useSignIn() {
       });
 
       if (response && response.status === 200) {
+        setUserLogged({
+          id: response.data.data.id,
+          name: response.data.data.name,
+          email: response.data.data.email,
+          dateOfBirth: response.data.data.dateOfBirth,
+          phoneNumber: response.data.data.phoneNumber,
+          role: response.data.data.role,
+          companyId: response.data.data.companyId,
+        });
+
         await AsyncStorage.removeItem("@agende-ja:user");
         await AsyncStorage.setItem(
           "@agende-ja:user",

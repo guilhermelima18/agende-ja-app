@@ -1,6 +1,8 @@
 import {
   createContext,
+  Dispatch,
   ReactNode,
+  SetStateAction,
   useCallback,
   useContext,
   useEffect,
@@ -24,6 +26,7 @@ type UserProviderProps = {
 
 type UserContextProps = {
   userLogged: UserProps;
+  setUserLogged: Dispatch<SetStateAction<UserProps>>;
 };
 
 export const UserContext = createContext({} as UserContextProps);
@@ -53,6 +56,7 @@ export function UserProvider({ children }: UserProviderProps) {
     <UserContext.Provider
       value={{
         userLogged,
+        setUserLogged,
       }}
     >
       {children}

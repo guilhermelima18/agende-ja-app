@@ -1,9 +1,12 @@
 import { FlatList, View, Text } from "react-native";
-import { Button } from "react-native-paper";
 import { Plus } from "lucide-react-native";
 
 import { Layout } from "@/components/layout";
+import { Button } from "@/components/button";
 import { CardItem } from "./components/card-item";
+
+import { theme } from "@/styles/theme";
+import { Header } from "@/components/header";
 
 export type Appointments = {
   id: number;
@@ -33,25 +36,34 @@ const appointments: Appointments[] = [
 export function Appointments() {
   return (
     <Layout>
-      <View className="w-full flex-1 flex-col">
-        <View className="flex flex-col gap-4">
-          <View className="my-4">
-            <Text className="font-semibold text-2xl">Agendamentos</Text>
+      <Header title="Agendamentos" />
+      <View
+        style={{
+          width: "100%",
+          flex: 1,
+          flexDirection: "column",
+          marginBottom: 20,
+        }}
+      >
+        <FlatList
+          data={appointments}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={({ item }) => <CardItem appointments={item} />}
+        />
+
+        <Button>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 2,
+            }}
+          >
+            <Plus color="#fff" size={20} />
+            <Text style={{ color: "#fff" }}>Novo agendamento</Text>
           </View>
-
-          <FlatList
-            data={appointments}
-            keyExtractor={(item) => String(item.id)}
-            renderItem={({ item }) => <CardItem appointments={item} />}
-          />
-
-          <Button mode="contained" className="w-full mt-20">
-            <View className="flex-row items-center justify-center gap-1">
-              <Plus color="#fff" size={20} />
-              <Text style={{ color: "#fff" }}>Novo agendamento</Text>
-            </View>
-          </Button>
-        </View>
+        </Button>
       </View>
     </Layout>
   );

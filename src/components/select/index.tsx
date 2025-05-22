@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, FlatList, Modal } from "react-native";
 import { Controller } from "react-hook-form";
-import { Feather } from "@expo/vector-icons";
+import { ArrowDown } from "lucide-react-native";
+import { theme } from "@/styles/theme";
 
 type OptionsProps = {
   label: string;
@@ -26,22 +27,37 @@ export function Select({
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   return (
-    <View className="w-full mt-1">
+    <View style={{ width: "100%" }}>
       <Controller
         name={name}
         control={control}
         render={({ field: { value, onChange } }) => (
           <>
             <TouchableOpacity
-              className="w-full border border-gray-500 h-14 flex-row items-center justify-between p-4 rounded-md"
+              style={{
+                width: "100%",
+                height: 50,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: 4,
+                borderRadius: 6,
+                borderWidth: 1,
+                borderColor: theme.colors.gray[200],
+              }}
               onPress={() => setModalIsOpen(!modalIsOpen)}
             >
-              <Text>
+              <Text
+                style={{
+                  fontSize: theme.fontSizes.md,
+                  color: theme.colors.gray[300],
+                }}
+              >
                 {value
                   ? options.find((option) => option.value === value)?.label
                   : placeholder}
               </Text>
-              <Feather name="arrow-down" size={16} color="#000" />
+              <ArrowDown size={16} color="#000" />
             </TouchableOpacity>
 
             <Modal
@@ -51,12 +67,20 @@ export function Select({
               onRequestClose={() => {}}
             >
               <TouchableOpacity
-                className="bg-gray-200 flex-1 justify-center"
+                style={{
+                  backgroundColor: theme.colors.gray[200],
+                  flex: 1,
+                  justifyContent: "center",
+                }}
                 activeOpacity={1}
                 onPress={() => setModalIsOpen(false)}
               >
                 <TouchableOpacity
-                  className="bg-white m-3 rounded-md p-2"
+                  style={{
+                    backgroundColor: theme.colors.white,
+                    borderRadius: 6,
+                    padding: 4,
+                  }}
                   activeOpacity={1}
                 >
                   <FlatList
@@ -65,7 +89,12 @@ export function Select({
                     keyExtractor={(item) => item.value.toString()}
                     renderItem={({ item }) => (
                       <TouchableOpacity
-                        className="bg-gray-100 px-2 py-4 rounded-md"
+                        style={{
+                          backgroundColor: theme.colors.gray[100],
+                          paddingHorizontal: 4,
+                          paddingVertical: 6,
+                          borderRadius: 6,
+                        }}
                         onPress={() => {
                           onChange(item.value);
                           setModalIsOpen(false);
@@ -81,7 +110,11 @@ export function Select({
           </>
         )}
       />
-      {!!error && <Text className="text-red-500 mt-2">{error}</Text>}
+      {!!error && (
+        <Text style={{ color: theme.colors.red[500], marginTop: 4 }}>
+          {error}
+        </Text>
+      )}
     </View>
   );
 }

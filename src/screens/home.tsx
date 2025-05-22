@@ -1,42 +1,67 @@
 import { View, Text, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Button } from "react-native-paper";
 import { CalendarCheck } from "lucide-react-native";
 
 import { useUserContext } from "@/contexts/user";
 
 import { Layout } from "@/components/layout";
 import { AppNavigationRoutes } from "@/@types/app-navigation";
+import { Button } from "@/components/button";
+import { theme } from "@/styles/theme";
+import { Header } from "@/components/header";
 
 export function Home() {
-  const { navigate } = useNavigation<AppNavigationRoutes>();
+  const navigation = useNavigation<AppNavigationRoutes>();
   const { userLogged } = useUserContext();
 
   return (
     <Layout>
-      <View className="w-full flex-1 flex-col items-center justify-center gap-8">
+      <Header />
+      <View
+        style={{
+          width: "100%",
+          flex: 1,
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 8,
+        }}
+      >
         <Image
-          className="w-40 h-40"
+          style={{ width: 140, height: 140 }}
           source={require("../assets/icons/logo-agende-ja.png")}
         />
 
         {userLogged && userLogged?.role === "admin" && (
-          <Button mode="contained" onPress={() => navigate("appointments")}>
-            <View className="flex-row items-center justify-center gap-1">
+          <Button onPress={() => navigation.push("appointments")}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 2,
+              }}
+            >
               <CalendarCheck color="#fff" size={20} />
-              <Text className="text-white">Ver horários</Text>
+              <Text style={{ color: theme.colors.white }}>Ver horários</Text>
             </View>
           </Button>
         )}
 
         {userLogged && userLogged?.role === "user" && (
-          <Button
-            mode="contained"
-            onPress={() => navigate("scheduling-step-one")}
-          >
-            <View className="flex-row items-center justify-center gap-1">
+          <Button onPress={() => navigation.push("scheduling-step-one")}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 2,
+              }}
+            >
               <CalendarCheck color="#fff" size={20} />
-              <Text className="text-white">Agende seu horário</Text>
+              <Text style={{ color: theme.colors.white }}>
+                Agende seu horário
+              </Text>
             </View>
           </Button>
         )}

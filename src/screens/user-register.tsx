@@ -1,7 +1,14 @@
 import { useEffect, useMemo } from "react";
-import { View, Image, Text, ScrollView, Alert } from "react-native";
+import {
+  View,
+  Image,
+  Text,
+  ScrollView,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Button, TextInput } from "react-native-paper";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -10,6 +17,8 @@ import { useCompanies } from "@/hooks/use-companies";
 
 import { Layout } from "@/components/layout";
 import { Select } from "@/components/select";
+import { Input } from "@/components/input";
+import { Button } from "@/components/button";
 
 import { dateMask, phoneMask } from "@/helpers/masks";
 import {
@@ -17,6 +26,8 @@ import {
   UserRegisterType,
 } from "@/validations/user-register";
 import { AppNavigationRoutes } from "@/@types/app-navigation";
+
+import { theme } from "@/styles/theme";
 
 export function UserRegister() {
   const {
@@ -28,7 +39,7 @@ export function UserRegister() {
     mode: "onChange",
   });
 
-  const { navigate } = useNavigation<AppNavigationRoutes>();
+  const navigation = useNavigation<AppNavigationRoutes>();
   const { createUser } = useUsers();
   const { companies, getCompanies } = useCompanies();
 
@@ -61,7 +72,7 @@ export function UserRegister() {
         {
           text: "OK",
           onPress: async () => {
-            navigate("sign-in");
+            navigation.push("sign-in");
           },
         },
       ]);
@@ -74,154 +85,291 @@ export function UserRegister() {
 
   return (
     <Layout>
-      <ScrollView>
-        <View className="w-full flex-1 flex-col items-center mt-10">
-          <Image
-            className="w-40 h-40 mb-4"
-            source={require("../assets/icons/logo-agende-ja.png")}
-          />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"} // Ajuste conforme o sistema operacional
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1 }}
+          style={{
+            width: "100%",
+            flex: 1,
+          }}
+        >
+          <View
+            style={{
+              width: "100%",
+              flex: 1,
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Image
+              style={{
+                width: 140,
+                height: 140,
+                marginBottom: 4,
+              }}
+              source={require("../assets/icons/logo-agende-ja.png")}
+            />
 
-          <View className="w-full">
-            <View className="flex-col gap-2 mb-4">
-              <View>
-                <Controller
-                  name="name"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <TextInput
-                      autoCapitalize="words"
-                      mode="outlined"
-                      label="Nome"
-                      placeholder="Digite seu nome"
-                      value={value}
-                      onChangeText={onChange}
-                    />
-                  )}
-                />
-                {errors.name?.message && (
-                  <Text className="text-red-500 text-xs mt-1">
-                    {errors.name?.message}
-                  </Text>
-                )}
-              </View>
-
-              <View>
-                <Controller
-                  name="email"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <TextInput
-                      autoCapitalize="none"
-                      keyboardType="email-address"
-                      mode="outlined"
-                      label="E-mail"
-                      placeholder="Digite seu e-mail"
-                      value={value}
-                      onChangeText={onChange}
-                    />
-                  )}
-                />
-                {errors.email?.message && (
-                  <Text className="text-red-500 text-xs mt-1">
-                    {errors.email?.message}
-                  </Text>
-                )}
-              </View>
-
-              <View>
-                <Controller
-                  name="password"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <TextInput
-                      mode="outlined"
-                      label="Senha"
-                      placeholder="Digite sua senha"
-                      secureTextEntry
-                      value={value}
-                      onChangeText={onChange}
-                    />
-                  )}
-                />
-                {errors.password?.message && (
-                  <Text className="text-red-500 text-xs mt-1">
-                    {errors.password?.message}
-                  </Text>
-                )}
-              </View>
-
-              <View>
-                <Controller
-                  name="phone"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <TextInput
-                      keyboardType="numeric"
-                      mode="outlined"
-                      label="Celular"
-                      placeholder="Digite seu telefone ou celular"
-                      maxLength={15}
-                      value={phoneMask(value)}
-                      onChangeText={onChange}
-                    />
-                  )}
-                />
-                {errors.phone?.message && (
-                  <Text className="text-red-500 text-xs mt-1">
-                    {errors.phone?.message}
-                  </Text>
-                )}
-              </View>
-
-              <View>
-                <Controller
-                  name="dateOfBirth"
-                  control={control}
-                  render={({ field: { value, onChange } }) => (
-                    <TextInput
-                      keyboardType="numeric"
-                      mode="outlined"
-                      label="Data de nascimento"
-                      maxLength={10}
-                      value={dateMask(value)}
-                      onChangeText={onChange}
-                    />
-                  )}
-                />
-                {errors.dateOfBirth?.message && (
-                  <Text className="text-red-500 text-xs mt-1">
-                    {errors.dateOfBirth?.message}
-                  </Text>
-                )}
-              </View>
-            </View>
-
-            <View style={{ marginBottom: 20 }}>
-              <Select
-                name="company"
-                control={control}
-                options={companiesAdapterSelect}
-                placeholder="Selecione um estabelecimento"
-              />
-              {errors.company?.message && (
-                <Text className="text-red-500 text-xs mt-1">
-                  {errors.company?.message}
-                </Text>
-              )}
-            </View>
-
-            <View>
-              <Button
-                mode="contained"
-                disabled={isSubmitting}
-                onPress={handleSubmit(onRegister)}
+            <View style={{ width: "100%" }}>
+              <View
+                style={{ flexDirection: "column", gap: 20, marginBottom: 4 }}
               >
-                Cadastrar
-              </Button>
+                <View style={{ flexDirection: "column" }}>
+                  <Text
+                    style={{
+                      fontSize: theme.fontSizes.md,
+                      fontWeight: "600",
+                      marginBottom: 2,
+                    }}
+                  >
+                    Nome
+                  </Text>
+
+                  <Controller
+                    name="name"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <Input
+                        autoCapitalize="words"
+                        placeholder="Digite seu nome"
+                        value={value}
+                        onChangeText={onChange}
+                      />
+                    )}
+                  />
+                  {errors.name?.message && (
+                    <Text
+                      style={{
+                        color: theme.colors.red[500],
+                        fontSize: theme.fontSizes.xs,
+                        marginTop: 2,
+                      }}
+                    >
+                      {errors.name?.message}
+                    </Text>
+                  )}
+                </View>
+
+                <View style={{ flexDirection: "column" }}>
+                  <Text
+                    style={{
+                      fontSize: theme.fontSizes.md,
+                      fontWeight: "600",
+                      marginBottom: 2,
+                    }}
+                  >
+                    E-mail
+                  </Text>
+
+                  <Controller
+                    name="email"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <Input
+                        autoCapitalize="none"
+                        keyboardType="email-address"
+                        placeholder="Digite seu e-mail"
+                        value={value}
+                        onChangeText={onChange}
+                      />
+                    )}
+                  />
+                  {errors.email?.message && (
+                    <Text
+                      style={{
+                        color: theme.colors.red[500],
+                        fontSize: theme.fontSizes.xs,
+                        marginTop: 2,
+                      }}
+                    >
+                      {errors.email?.message}
+                    </Text>
+                  )}
+                </View>
+
+                <View style={{ flexDirection: "column" }}>
+                  <Text
+                    style={{
+                      fontSize: theme.fontSizes.md,
+                      fontWeight: "600",
+                      marginBottom: 2,
+                    }}
+                  >
+                    Senha
+                  </Text>
+
+                  <Controller
+                    name="password"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <Input
+                        placeholder="Digite sua senha"
+                        secureTextEntry
+                        value={value}
+                        onChangeText={onChange}
+                      />
+                    )}
+                  />
+                  {errors.password?.message && (
+                    <Text
+                      style={{
+                        color: theme.colors.red[500],
+                        fontSize: theme.fontSizes.xs,
+                        marginTop: 2,
+                      }}
+                    >
+                      {errors.password?.message}
+                    </Text>
+                  )}
+                </View>
+
+                <View style={{ flexDirection: "column" }}>
+                  <Text
+                    style={{
+                      fontSize: theme.fontSizes.md,
+                      fontWeight: "600",
+                      marginBottom: 2,
+                    }}
+                  >
+                    Celular
+                  </Text>
+
+                  <Controller
+                    name="phone"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <Input
+                        keyboardType="numeric"
+                        placeholder="Digite seu telefone ou celular"
+                        maxLength={15}
+                        value={phoneMask(value)}
+                        onChangeText={onChange}
+                      />
+                    )}
+                  />
+                  {errors.phone?.message && (
+                    <Text
+                      style={{
+                        color: theme.colors.red[500],
+                        fontSize: theme.fontSizes.xs,
+                        marginTop: 2,
+                      }}
+                    >
+                      {errors.phone?.message}
+                    </Text>
+                  )}
+                </View>
+
+                <View style={{ flexDirection: "column" }}>
+                  <Text
+                    style={{
+                      fontSize: theme.fontSizes.md,
+                      fontWeight: "600",
+                      marginBottom: 2,
+                    }}
+                  >
+                    Data de nascimento
+                  </Text>
+
+                  <Controller
+                    name="dateOfBirth"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <Input
+                        keyboardType="numeric"
+                        placeholder="Digite sua data de nascimento"
+                        maxLength={10}
+                        value={dateMask(value)}
+                        onChangeText={onChange}
+                      />
+                    )}
+                  />
+                  {errors.dateOfBirth?.message && (
+                    <Text
+                      style={{
+                        color: theme.colors.red[500],
+                        fontSize: theme.fontSizes.xs,
+                        marginTop: 2,
+                      }}
+                    >
+                      {errors.dateOfBirth?.message}
+                    </Text>
+                  )}
+                </View>
+
+                <View style={{ flexDirection: "column" }}>
+                  <Text
+                    style={{
+                      fontSize: theme.fontSizes.md,
+                      fontWeight: "600",
+                      marginBottom: 2,
+                    }}
+                  >
+                    Estabelecimento
+                  </Text>
+
+                  <Select
+                    name="company"
+                    control={control}
+                    options={companiesAdapterSelect}
+                    placeholder="Selecione um estabelecimento"
+                  />
+                  {errors.company?.message && (
+                    <Text
+                      style={{
+                        color: theme.colors.red[500],
+                        fontSize: theme.fontSizes.xs,
+                        marginTop: 2,
+                      }}
+                    >
+                      {errors.company?.message}
+                    </Text>
+                  )}
+                </View>
+              </View>
+
+              <View style={{ flexDirection: "column", gap: 10, marginTop: 20 }}>
+                <Button
+                  disabled={isSubmitting}
+                  onPress={handleSubmit(onRegister)}
+                >
+                  <Text
+                    style={{
+                      color: theme.colors.white,
+                      fontWeight: "600",
+                      fontSize: theme.fontSizes.md,
+                    }}
+                  >
+                    Cadastrar
+                  </Text>
+                </Button>
+
+                <Button
+                  backgroundColor={theme.colors.red[500]}
+                  disabled={isSubmitting}
+                  onPress={() => navigation.push("sign-in")}
+                >
+                  <Text
+                    style={{
+                      color: theme.colors.white,
+                      fontWeight: "600",
+                      fontSize: theme.fontSizes.md,
+                    }}
+                  >
+                    Cancelar
+                  </Text>
+                </Button>
+              </View>
             </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </Layout>
   );
 }
