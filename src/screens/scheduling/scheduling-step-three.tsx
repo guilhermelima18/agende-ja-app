@@ -1,11 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import { View, Text, Image, ScrollView, Alert } from "react-native";
-import { ActivityIndicator, Button } from "react-native-paper";
+import {
+  View,
+  Text,
+  Image,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Controller, useFormContext } from "react-hook-form";
 import { Calendar } from "react-native-calendars";
 
-import { useUser } from "@/contexts/user";
+import { useUserContext } from "@/contexts/user";
 import { useAppointments } from "@/hooks/use-appointments";
 
 import { Layout } from "@/components/layout";
@@ -16,6 +22,8 @@ import { formatDate, formatHour, getTodayDate } from "@/helpers/functions";
 import { AppNavigationRoutes } from "@/@types/app-navigation";
 import { schedulingHours } from "@/helpers/constants";
 import { removeUserStorage } from "@/hooks/use-storage";
+import { theme } from "@/styles/theme";
+import { Button } from "@/components/button";
 
 type RouteParams = {
   professionalId: string;
@@ -29,11 +37,12 @@ export function SchedulingStepThree() {
   const {
     control,
     handleSubmit,
+    reset,
     formState: { isSubmitting },
   } = useFormContext();
-  const { navigate, reset } = useNavigation<AppNavigationRoutes>();
+  const { navigate } = useNavigation<AppNavigationRoutes>();
   const { params } = useRoute();
-  const { userLogged } = useUser();
+  const { userLogged } = useUserContext();
   const { appointments, getAppointments, createAppointment } =
     useAppointments();
 
@@ -67,7 +76,7 @@ export function SchedulingStepThree() {
       return availableHours;
     }
 
-    return [];
+    return schedulingHours;
   }, [disabledDatesArray, dateSelected]);
 
   async function onSubmitStepThree(data: any) {
@@ -96,7 +105,8 @@ export function SchedulingStepThree() {
           text: "OK",
           onPress: async () => {
             await removeUserStorage();
-            reset({ routes: [{ name: "sign-in" }] });
+            reset();
+            navigate("sign-in");
           },
         },
       ]);
@@ -115,10 +125,24 @@ export function SchedulingStepThree() {
   return (
     <Layout>
       <ScrollView>
-        <View className="w-full flex-1 flex-col justify-center gap-4">
-          <View className="w-full items-center mb-10">
+        <View
+          style={{
+            width: "100%",
+            flex: 1,
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: 4,
+          }}
+        >
+          <View
+            style={{
+              width: "100%",
+              alignItems: "center",
+              marginBottom: 10,
+            }}
+          >
             <Image
-              className="w-40 h-40"
+              style={{ width: 140, height: 140 }}
               source={require("../../assets/icons/logo-agende-ja.png")}
             />
           </View>
@@ -126,7 +150,7 @@ export function SchedulingStepThree() {
           <StepProgress progress={100} />
           <Text>Dia e horário</Text>
 
-          <View className="mt-10">
+          <View style={{ marginTop: 10, flexDirection: "column", gap: 20 }}>
             <View>
               <Text>Selecione a data:</Text>
               <Controller
@@ -151,7 +175,7 @@ export function SchedulingStepThree() {
               />
             </View>
 
-            <View className="mt-4">
+            <View style={{ marginTop: 10 }}>
               <Text>Selecione o horário:</Text>
 
               <Select
@@ -163,15 +187,15 @@ export function SchedulingStepThree() {
             </View>
 
             <Button
-              mode="contained"
-              className="mt-4"
               disabled={isSubmitting}
               onPress={handleSubmit(onSubmitStepThree)}
             >
               {isSubmitting ? (
                 <ActivityIndicator animating color="#fff" />
               ) : (
-                "Finalizar agendamento"
+                <Text style={{ color: theme.colors.white }}>
+                  Finalizar agendamento
+                </Text>
               )}
             </Button>
           </View>

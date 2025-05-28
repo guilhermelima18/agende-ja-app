@@ -5,10 +5,11 @@ import { CalendarCheck } from "lucide-react-native";
 import { useUserContext } from "@/contexts/user";
 
 import { Layout } from "@/components/layout";
-import { AppNavigationRoutes } from "@/@types/app-navigation";
-import { Button } from "@/components/button";
-import { theme } from "@/styles/theme";
 import { Header } from "@/components/header";
+import { Button } from "@/components/button";
+
+import { AppNavigationRoutes } from "@/@types/app-navigation";
+import { theme } from "@/styles/theme";
 
 export function Home() {
   const navigation = useNavigation<AppNavigationRoutes>();

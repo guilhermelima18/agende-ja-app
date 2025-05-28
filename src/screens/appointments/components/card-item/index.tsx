@@ -1,18 +1,27 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import { Pencil, Trash } from "lucide-react-native";
 
-import { Appointments } from "../..";
+import { AppointmentsProps } from "@/hooks/use-appointments";
+
 import { theme } from "@/styles/theme";
 
 type CardItemProps = {
-  appointments: Appointments;
+  appointment: AppointmentsProps;
+  handleDeleteAppointment: ({
+    appointmentId,
+  }: {
+    appointmentId: string;
+  }) => void;
 };
 
-export function CardItem({ appointments }: CardItemProps) {
+export function CardItem({
+  appointment,
+  handleDeleteAppointment,
+}: CardItemProps) {
   return (
     <View
       style={{
-        padding: 4,
+        padding: 8,
         borderBottomWidth: 1,
         borderBottomColor: theme.colors.gray[300],
         flexDirection: "row",
@@ -20,7 +29,18 @@ export function CardItem({ appointments }: CardItemProps) {
         justifyContent: "space-between",
       }}
     >
-      <Text style={{ fontSize: theme.fontSizes.md }}>{appointments?.name}</Text>
+      <View style={{ flexDirection: "column", gap: 4 }}>
+        <Text style={{ fontSize: theme.fontSizes.md, fontWeight: "600" }}>
+          {appointment?.user}
+        </Text>
+        <Text style={{ fontSize: theme.fontSizes.sm }}>
+          {appointment?.service}
+        </Text>
+        <Text style={{ fontSize: theme.fontSizes.sm }}>
+          {appointment?.scheduledAt}
+        </Text>
+      </View>
+
       <View
         style={{
           flexDirection: "row",
@@ -44,6 +64,9 @@ export function CardItem({ appointments }: CardItemProps) {
             padding: 8,
             borderRadius: 6,
           }}
+          onPress={() =>
+            handleDeleteAppointment({ appointmentId: appointment?.id })
+          }
         >
           <Trash color="#fff" size={18} />
         </TouchableOpacity>

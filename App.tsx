@@ -34,7 +34,7 @@ export default function App() {
               <Stack.Screen name="home" component={Home} />
               <Stack.Screen name="appointments" component={Appointments} />
 
-              {/* <Stack.Screen
+              <Stack.Screen
                 name="scheduling-step-one"
                 component={SchedulingStepOne}
               />
@@ -45,7 +45,7 @@ export default function App() {
               <Stack.Screen
                 name="scheduling-step-three"
                 component={SchedulingStepThree}
-              /> */}
+              />
             </Stack.Navigator>
           </FormProvider>
         </Contexts>

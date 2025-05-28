@@ -71,6 +71,7 @@ export function Select({
                   backgroundColor: theme.colors.gray[200],
                   flex: 1,
                   justifyContent: "center",
+                  padding: 8,
                 }}
                 activeOpacity={1}
                 onPress={() => setModalIsOpen(false)}
@@ -79,7 +80,7 @@ export function Select({
                   style={{
                     backgroundColor: theme.colors.white,
                     borderRadius: 6,
-                    padding: 4,
+                    padding: 8,
                   }}
                   activeOpacity={1}
                 >
@@ -91,8 +92,7 @@ export function Select({
                       <TouchableOpacity
                         style={{
                           backgroundColor: theme.colors.gray[100],
-                          paddingHorizontal: 4,
-                          paddingVertical: 6,
+                          padding: 12,
                           borderRadius: 6,
                         }}
                         onPress={() => {

@@ -1,20 +1,22 @@
 import { useCallback, useState } from "react";
 import { Alert } from "react-native";
+import { format, parse } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
 import { api } from "@/libs/axios";
 
-type AppointmentsProps = {
+export type AppointmentsProps = {
   id: string;
-  userId: string;
-  serviceId: string;
   scheduledAt: string;
   status: "PENDING" | "CONFIRMED" | "CANCELED";
-  createdAt: string;
-  professionalId: string;
-  companyId: string;
+  company: string;
+  professional: string;
+  service: string;
+  user: string;
 };
 
 type GetAppointmentsParams = {
-  professionalId: string;
+  professionalId?: string;
   companyId: string;
 };
 
@@ -29,19 +31,41 @@ type CreateAppointmentBody = {
 
 export function useAppointments() {
   const [appointments, setAppointments] = useState<AppointmentsProps[]>([]);
+  const [deleteAppointmentLoading, setDeleteAppointmentLoading] =
+    useState(false);
 
   const getAppointments = useCallback(
     async ({ professionalId, companyId }: GetAppointmentsParams) => {
       try {
-        const response = await api.get(
-          `/appointments?professionalId=${professionalId}&companyId=${companyId}`
-        );
+        const response = await api.get("/appointments", {
+          params: {
+            ...(companyId && {
+              companyId,
+            }),
+            ...(professionalId && {
+              professionalId,
+            }),
+          },
+        });
 
         if (response) {
-          setAppointments(response.data.data);
+          const appointmentsFormatted = response.data.data.map(
+            (appointment: AppointmentsProps) => ({
+              ...appointment,
+              scheduledAt: format(
+                appointment.scheduledAt,
+                "dd 'de' MMMM 'de' yyyy 'às' HH:mm",
+                {
+                  locale: ptBR,
+                }
+              ),
+            })
+          );
+
+          setAppointments(appointmentsFormatted);
         }
-      } catch (error) {
-        console.log(error);
+      } catch (error: any) {
+        console.log(error.response.data.error);
       }
     },
     []
@@ -71,10 +95,37 @@ export function useAppointments() {
           status: response.status,
         };
       } catch (error: any) {
+        console.log(error.response.data.error);
+
         Alert.alert(
           "Ops!",
-          error.response.data.message || "Não foi possível fazer o agendamento!"
+          error.response.data.error || "Não foi possível fazer o agendamento!"
         );
+      }
+    },
+    []
+  );
+
+  const deleteAppointment = useCallback(
+    async ({ appointmentId }: { appointmentId: string }) => {
+      try {
+        setDeleteAppointmentLoading(true);
+
+        const response = await api.delete(`/appointments/${appointmentId}`);
+
+        return {
+          data: response.data,
+          status: response.status,
+        };
+      } catch (error: any) {
+        console.log(error.response.data.error);
+
+        Alert.alert(
+          "Ops!",
+          error.response.data.error || "Não foi possível excluir o agendamento!"
+        );
+      } finally {
+        setDeleteAppointmentLoading(false);
       }
     },
     []
@@ -82,7 +133,9 @@ export function useAppointments() {
 
   return {
     appointments,
+    deleteAppointmentLoading,
     getAppointments,
     createAppointment,
+    deleteAppointment,
   };
 }

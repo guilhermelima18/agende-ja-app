@@ -1,6 +1,10 @@
 import { Text, TouchableOpacity, View } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { LogOut } from "lucide-react-native";
 
+import { removeUserStorage } from "@/hooks/use-storage";
+
+import { AppNavigationRoutes } from "@/@types/app-navigation";
 import { theme } from "@/styles/theme";
 
 type HeaderProps = {
@@ -8,7 +12,12 @@ type HeaderProps = {
 };
 
 export function Header({ title }: HeaderProps) {
-  const onSignOut = () => {};
+  const navigation = useNavigation<AppNavigationRoutes>();
+
+  const onSignOut = async () => {
+    await removeUserStorage();
+    navigation.push("sign-in");
+  };
 
   return (
     <View

@@ -1,17 +1,18 @@
 import { useEffect, useMemo } from "react";
 import { View, Text, ScrollView, Image, Alert } from "react-native";
-import { Button } from "react-native-paper";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useFormContext } from "react-hook-form";
 
-import { useUser } from "@/contexts/user";
+import { useUserContext } from "@/contexts/user";
 import { useServices } from "@/hooks/use-services";
 
 import { Layout } from "@/components/layout";
 import { Select } from "@/components/select";
 import { StepProgress } from "@/components/step-progress";
+import { Button } from "@/components/button";
 
 import { AppNavigationRoutes } from "@/@types/app-navigation";
+import { theme } from "@/styles/theme";
 
 type RouteParams = {
   professionalId: string;
@@ -21,7 +22,7 @@ export function SchedulingStepTwo() {
   const { control, handleSubmit } = useFormContext();
   const { navigate } = useNavigation<AppNavigationRoutes>();
   const { params } = useRoute();
-  const { userLogged } = useUser();
+  const { userLogged } = useUserContext();
   const { services, getServices } = useServices();
 
   const { professionalId } = params as RouteParams;
@@ -59,10 +60,24 @@ export function SchedulingStepTwo() {
   return (
     <Layout>
       <ScrollView>
-        <View className="w-full flex-1 flex-col justify-center gap-4">
-          <View className="w-full items-center mb-10">
+        <View
+          style={{
+            width: "100%",
+            flex: 1,
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: 4,
+          }}
+        >
+          <View
+            style={{
+              width: "100%",
+              alignItems: "center",
+              marginBottom: 10,
+            }}
+          >
             <Image
-              className="w-40 h-40"
+              style={{ width: 140, height: 140 }}
               source={require("../../assets/icons/logo-agende-ja.png")}
             />
           </View>
@@ -70,7 +85,7 @@ export function SchedulingStepTwo() {
           <StepProgress progress={66} />
           <Text>Serviço</Text>
 
-          <View className="mt-10">
+          <View style={{ marginTop: 10, flexDirection: "column", gap: 20 }}>
             <Select
               name="service"
               control={control}
@@ -78,8 +93,8 @@ export function SchedulingStepTwo() {
               placeholder="Selecione um serviço"
             />
 
-            <Button mode="contained" onPress={handleSubmit(onSubmitStepTwo)}>
-              Próximo
+            <Button onPress={handleSubmit(onSubmitStepTwo)}>
+              <Text style={{ color: theme.colors.white }}>Próximo</Text>
             </Button>
           </View>
         </View>

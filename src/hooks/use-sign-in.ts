@@ -45,8 +45,7 @@ export function useSignIn() {
     } catch (error: any) {
       Alert.alert(
         "Ops!",
-        error.response.data.message ||
-          "Não foi possível encontrar esse usuário!"
+        error.response.data.error || "Não foi possível encontrar esse usuário!"
       );
     }
   }, []);
