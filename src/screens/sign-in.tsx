@@ -10,7 +10,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LogIn } from "lucide-react-native";
+import { LogIn, UserCircle } from "lucide-react-native";
 
 import { useSignIn } from "@/hooks/use-sign-in";
 
@@ -49,7 +49,7 @@ export function SignIn() {
   }
 
   return (
-    <Layout>
+    <Layout showHeader={false}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"} // Ajuste conforme o sistema operacional
         style={{ flex: 1 }}
@@ -69,7 +69,6 @@ export function SignIn() {
               flex: 1,
               flexDirection: "column",
               alignItems: "center",
-              justifyContent: "center",
             }}
           >
             <Image
@@ -81,7 +80,15 @@ export function SignIn() {
               source={require("../assets/icons/logo-agende-ja.png")}
             />
 
-            <View style={{ width: "100%" }}>
+            <View
+              style={{
+                flex: 1,
+                width: "100%",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                marginBottom: 20,
+              }}
+            >
               <View
                 style={{ flexDirection: "column", gap: 20, marginBottom: 4 }}
               >
@@ -155,36 +162,38 @@ export function SignIn() {
                     </Text>
                   )}
                 </View>
+
+                <View style={{ flexDirection: "column", gap: 10 }}>
+                  <Button
+                    disabled={isSubmitting}
+                    onPress={handleSubmit(handleSignIn)}
+                  >
+                    {isSubmitting ? (
+                      <ActivityIndicator animating color="#fff" />
+                    ) : (
+                      <View style={{ flexDirection: "row", gap: 4 }}>
+                        <Text
+                          style={{
+                            color: theme.colors.white,
+                            fontWeight: "600",
+                            fontSize: theme.fontSizes.md,
+                          }}
+                        >
+                          Entrar
+                        </Text>
+                        <LogIn color={theme.colors.white} />
+                      </View>
+                    )}
+                  </Button>
+                </View>
               </View>
 
-              <View style={{ flexDirection: "column", gap: 10, marginTop: 20 }}>
-                <Button
-                  disabled={isSubmitting}
-                  onPress={handleSubmit(handleSignIn)}
-                >
-                  {isSubmitting ? (
-                    <ActivityIndicator animating color="#fff" />
-                  ) : (
-                    <View style={{ flexDirection: "row", gap: 4 }}>
-                      <Text
-                        style={{
-                          color: theme.colors.white,
-                          fontWeight: "600",
-                          fontSize: theme.fontSizes.md,
-                        }}
-                      >
-                        Entrar
-                      </Text>
-                      <LogIn color={theme.colors.white} />
-                    </View>
-                  )}
-                </Button>
-
-                <Button
-                  backgroundColor={theme.colors.red[500]}
-                  disabled={isSubmitting}
-                  onPress={() => navigation.push("user-register")}
-                >
+              <Button
+                backgroundColor={theme.colors.red[500]}
+                disabled={isSubmitting}
+                onPress={() => navigation.push("user-register")}
+              >
+                <View style={{ flexDirection: "row", gap: 4 }}>
                   <Text
                     style={{
                       color: theme.colors.white,
@@ -192,10 +201,11 @@ export function SignIn() {
                       fontSize: theme.fontSizes.md,
                     }}
                   >
-                    Cadastrar-se
+                    Cadastre-se
                   </Text>
-                </Button>
-              </View>
+                  <UserCircle color={theme.colors.white} />
+                </View>
+              </Button>
             </View>
           </View>
         </ScrollView>

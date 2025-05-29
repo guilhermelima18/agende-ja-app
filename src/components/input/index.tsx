@@ -13,6 +13,7 @@ export function Input({ ...props }: InputProps) {
         borderColor: theme.colors.gray[200],
         borderRadius: 6,
         fontSize: theme.fontSizes.md,
+        paddingHorizontal: 14,
       }}
       {...props}
     />

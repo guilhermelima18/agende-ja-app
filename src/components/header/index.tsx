@@ -27,25 +27,32 @@ export function Header({ title }: HeaderProps) {
         alignItems: "center",
         justifyContent: title ? "space-between" : "flex-end",
         marginTop: 20,
-        marginBottom: 40,
+        marginBottom: 20,
       }}
     >
       {title && (
-        <Text
+        <View
           style={{
-            fontWeight: "600",
-            fontSize: theme.fontSizes.xl,
-            marginBottom: 20,
+            paddingBottom: 1,
+            borderBottomWidth: 1,
+            borderBottomColor: theme.colors.gray[700],
           }}
         >
-          {title}
-        </Text>
+          <Text
+            style={{
+              fontWeight: "600",
+              fontSize: theme.fontSizes.xl,
+            }}
+          >
+            {title}
+          </Text>
+        </View>
       )}
 
       <TouchableOpacity
         style={{
           backgroundColor: theme.colors.red[500],
-          padding: 8,
+          padding: 12,
           borderRadius: 6,
         }}
         onPress={onSignOut}

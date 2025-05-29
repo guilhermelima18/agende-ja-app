@@ -18,6 +18,7 @@ export type AppointmentsProps = {
 type GetAppointmentsParams = {
   professionalId?: string;
   companyId: string;
+  userId?: string;
 };
 
 type CreateAppointmentBody = {
@@ -31,12 +32,19 @@ type CreateAppointmentBody = {
 
 export function useAppointments() {
   const [appointments, setAppointments] = useState<AppointmentsProps[]>([]);
+  const [appointmentLoading, setAppointmentLoading] = useState(false);
+  const [createAppointmentLoading, setCreateAppointmentLoading] =
+    useState(false);
+  const [updateAppointmentLoading, setUpdateAppointmentLoading] =
+    useState(false);
   const [deleteAppointmentLoading, setDeleteAppointmentLoading] =
     useState(false);
 
   const getAppointments = useCallback(
-    async ({ professionalId, companyId }: GetAppointmentsParams) => {
+    async ({ professionalId, companyId, userId }: GetAppointmentsParams) => {
       try {
+        setAppointmentLoading(true);
+
         const response = await api.get("/appointments", {
           params: {
             ...(companyId && {
@@ -44,6 +52,9 @@ export function useAppointments() {
             }),
             ...(professionalId && {
               professionalId,
+            }),
+            ...(userId && {
+              userId,
             }),
           },
         });
@@ -66,6 +77,8 @@ export function useAppointments() {
         }
       } catch (error: any) {
         console.log(error.response.data.error);
+      } finally {
+        setAppointmentLoading(false);
       }
     },
     []
@@ -81,6 +94,8 @@ export function useAppointments() {
       status,
     }: CreateAppointmentBody) => {
       try {
+        setCreateAppointmentLoading(true);
+
         const response = await api.post("/appointments", {
           serviceId,
           professionalId,
@@ -101,6 +116,34 @@ export function useAppointments() {
           "Ops!",
           error.response.data.error || "Não foi possível fazer o agendamento!"
         );
+      } finally {
+        setCreateAppointmentLoading(false);
+      }
+    },
+    []
+  );
+
+  const updateAppointment = useCallback(
+    async ({ appointmentId }: { appointmentId: string }) => {
+      try {
+        setUpdateAppointmentLoading(true);
+
+        const response = await api.put(`/appointments/${appointmentId}`);
+
+        return {
+          data: response.data,
+          status: response.status,
+        };
+      } catch (error: any) {
+        console.log(error.response.data.error);
+
+        Alert.alert(
+          "Ops!",
+          error.response.data.error ||
+            "Não foi possível atualizar o agendamento!"
+        );
+      } finally {
+        setUpdateAppointmentLoading(false);
       }
     },
     []
@@ -133,9 +176,13 @@ export function useAppointments() {
 
   return {
     appointments,
+    appointmentLoading,
+    createAppointmentLoading,
+    updateAppointmentLoading,
     deleteAppointmentLoading,
     getAppointments,
     createAppointment,
+    updateAppointment,
     deleteAppointment,
   };
 }

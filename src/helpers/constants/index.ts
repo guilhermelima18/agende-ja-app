@@ -1,4 +1,4 @@
-const schedulingHours = [
+export const schedulingHours = [
   {
     label: "08:00:00",
     value: "08:00:00",
@@ -21,4 +21,8 @@ const schedulingHours = [
   },
 ];
 
-export { schedulingHours };
+export const appointmentsStatus = {
+  ["PENDING"]: "Pendente",
+  ["CANCELED"]: "Cancelado",
+  ["CONFIRMED"]: "Confirmado",
+};

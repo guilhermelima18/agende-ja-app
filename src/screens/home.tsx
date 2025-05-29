@@ -1,6 +1,6 @@
 import { View, Text, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { CalendarCheck } from "lucide-react-native";
+import { CalendarCheck, EyeIcon } from "lucide-react-native";
 
 import { useUserContext } from "@/contexts/user";
 
@@ -17,7 +17,6 @@ export function Home() {
 
   return (
     <Layout>
-      <Header />
       <View
         style={{
           width: "100%",
@@ -33,24 +32,28 @@ export function Home() {
           source={require("../assets/icons/logo-agende-ja.png")}
         />
 
-        {userLogged && userLogged?.role === "admin" && (
-          <Button onPress={() => navigation.push("appointments")}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 2,
-              }}
-            >
-              <CalendarCheck color="#fff" size={20} />
-              <Text style={{ color: theme.colors.white }}>Ver horários</Text>
-            </View>
-          </Button>
-        )}
+        {userLogged &&
+          (userLogged?.role === "admin" || userLogged?.role === "user") && (
+            <Button onPress={() => navigation.push("appointments")}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 2,
+                }}
+              >
+                <EyeIcon color="#fff" size={20} />
+                <Text style={{ color: theme.colors.white }}>Ver horários</Text>
+              </View>
+            </Button>
+          )}
 
         {userLogged && userLogged?.role === "user" && (
-          <Button onPress={() => navigation.push("scheduling-step-one")}>
+          <Button
+            backgroundColor={theme.colors.red[500]}
+            onPress={() => navigation.push("scheduling-step-one")}
+          >
             <View
               style={{
                 flexDirection: "row",

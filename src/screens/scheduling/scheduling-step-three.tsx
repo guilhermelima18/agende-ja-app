@@ -10,6 +10,7 @@ import {
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Controller, useFormContext } from "react-hook-form";
 import { Calendar } from "react-native-calendars";
+import { format } from "date-fns";
 
 import { useUserContext } from "@/contexts/user";
 import { useAppointments } from "@/hooks/use-appointments";
@@ -17,13 +18,13 @@ import { useAppointments } from "@/hooks/use-appointments";
 import { Layout } from "@/components/layout";
 import { Select } from "@/components/select";
 import { StepProgress } from "@/components/step-progress";
-
-import { formatDate, formatHour, getTodayDate } from "@/helpers/functions";
-import { AppNavigationRoutes } from "@/@types/app-navigation";
-import { schedulingHours } from "@/helpers/constants";
-import { removeUserStorage } from "@/hooks/use-storage";
-import { theme } from "@/styles/theme";
 import { Button } from "@/components/button";
+
+import { getTodayDate, parseCustomDate } from "@/helpers/functions";
+import { schedulingHours } from "@/helpers/constants";
+import { AppNavigationRoutes } from "@/@types/app-navigation";
+
+import { theme } from "@/styles/theme";
 
 type RouteParams = {
   professionalId: string;
@@ -59,9 +60,11 @@ export function SchedulingStepThree() {
   const hoursSelectAdapter = useMemo(() => {
     if (!!disabledDatesArray?.length && disabledDatesArray?.length > 0) {
       const disabledHours = disabledDatesArray.map((date) => {
+        const parsed = parseCustomDate(date);
+
         return {
-          date: formatDate(date),
-          hour: formatHour(date),
+          date: format(parsed, "yyyy-MM-dd"),
+          hour: format(parsed, "HH:mm:ss"),
         };
       });
 
@@ -104,9 +107,8 @@ export function SchedulingStepThree() {
         {
           text: "OK",
           onPress: async () => {
-            await removeUserStorage();
             reset();
-            navigate("sign-in");
+            navigate("appointments");
           },
         },
       ]);

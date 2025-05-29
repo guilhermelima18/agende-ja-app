@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { FlatList, View, Text, ActivityIndicator } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { Plus } from "lucide-react-native";
 
 import { useUserContext } from "@/contexts/user";
@@ -7,42 +8,46 @@ import { useAppointments } from "@/hooks/use-appointments";
 
 import { Layout } from "@/components/layout";
 import { Button } from "@/components/button";
-import { Header } from "@/components/header";
 import { CardItem } from "./components/card-item";
 
-export type Appointments = {
-  id: number;
-  name: string;
-  service: string;
-  professional: string;
-  status: string;
-};
-
-const appointments: Appointments[] = [
-  {
-    id: 1,
-    name: "Joelma Lima",
-    service: "Unhas em fibra (Alongamento)",
-    professional: "Jéssica Urniani",
-    status: "PENDENTE",
-  },
-  {
-    id: 2,
-    name: "Silvia Navarro",
-    service: "Unhas em fibra (Alongamento)",
-    professional: "Jéssica Urniani",
-    status: "CONFIRMADO",
-  },
-];
+import { AppNavigationRoutes } from "@/@types/app-navigation";
 
 export function Appointments() {
+  const navigation = useNavigation<AppNavigationRoutes>();
+
   const { userLogged } = useUserContext();
   const {
     appointments,
+    appointmentLoading,
+    updateAppointmentLoading,
     deleteAppointmentLoading,
     getAppointments,
+    updateAppointment,
     deleteAppointment,
   } = useAppointments();
+
+  const handleUpdateAppointment = async ({
+    appointmentId,
+  }: {
+    appointmentId: string;
+  }) => {
+    const result = await updateAppointment({ appointmentId });
+
+    if (result && result.status === 200) {
+      if (userLogged?.role === "admin") {
+        getAppointments({
+          companyId: userLogged?.companyId,
+        });
+      }
+
+      if (userLogged?.role === "user") {
+        getAppointments({
+          companyId: userLogged?.companyId,
+          userId: userLogged?.id,
+        });
+      }
+    }
+  };
 
   const handleDeleteAppointment = async ({
     appointmentId,
@@ -52,20 +57,41 @@ export function Appointments() {
     const result = await deleteAppointment({ appointmentId });
 
     if (result && result.status === 200) {
-      await getAppointments({ companyId: userLogged?.companyId });
+      if (userLogged?.role === "admin") {
+        getAppointments({
+          companyId: userLogged?.companyId,
+        });
+      }
+
+      if (userLogged?.role === "user") {
+        getAppointments({
+          companyId: userLogged?.companyId,
+          userId: userLogged?.id,
+        });
+      }
     }
   };
 
   useEffect(() => {
-    getAppointments({
-      companyId: userLogged?.companyId,
-    });
-  }, []);
+    if (userLogged?.role === "admin") {
+      getAppointments({
+        companyId: userLogged?.companyId,
+      });
+    }
+
+    if (userLogged?.role === "user") {
+      getAppointments({
+        companyId: userLogged?.companyId,
+        userId: userLogged?.id,
+      });
+    }
+  }, [userLogged]);
 
   return (
-    <Layout>
-      <Header title="Agendamentos" />
-      {deleteAppointmentLoading ? (
+    <Layout headerTitle="Agendamentos">
+      {appointmentLoading ||
+      updateAppointmentLoading ||
+      deleteAppointmentLoading ? (
         <View
           style={{
             width: "100%",
@@ -90,14 +116,19 @@ export function Appointments() {
             data={appointments}
             keyExtractor={(item) => String(item.id)}
             renderItem={({ item }) => (
-              <CardItem
-                appointment={item}
-                handleDeleteAppointment={handleDeleteAppointment}
-              />
+              <View
+                style={{ flexDirection: "column", gap: 10, marginBottom: 14 }}
+              >
+                <CardItem
+                  appointment={item}
+                  handleUpdateAppointment={handleUpdateAppointment}
+                  handleDeleteAppointment={handleDeleteAppointment}
+                />
+              </View>
             )}
           />
 
-          <Button>
+          <Button onPress={() => navigation.push("scheduling-step-one")}>
             <View
               style={{
                 flexDirection: "row",

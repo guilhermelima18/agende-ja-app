@@ -1,12 +1,18 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import { Pencil, Trash } from "lucide-react-native";
+import { Check, X } from "lucide-react-native";
 
 import { AppointmentsProps } from "@/hooks/use-appointments";
 
+import { appointmentsStatus } from "@/helpers/constants";
 import { theme } from "@/styles/theme";
 
 type CardItemProps = {
   appointment: AppointmentsProps;
+  handleUpdateAppointment: ({
+    appointmentId,
+  }: {
+    appointmentId: string;
+  }) => void;
   handleDeleteAppointment: ({
     appointmentId,
   }: {
@@ -16,28 +22,62 @@ type CardItemProps = {
 
 export function CardItem({
   appointment,
+  handleUpdateAppointment,
   handleDeleteAppointment,
 }: CardItemProps) {
+  const appointmentsStatusColor = (status: string) => {
+    return status === "PENDING"
+      ? theme.colors.blue[500]
+      : status === "CANCELED"
+      ? theme.colors.red[500]
+      : theme.colors.green[500];
+  };
+
   return (
     <View
       style={{
+        width: "100%",
         padding: 8,
-        borderBottomWidth: 1,
-        borderBottomColor: theme.colors.gray[300],
+        borderWidth: 1,
+        borderColor: theme.colors.gray[200],
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
+        borderRadius: 8,
       }}
     >
-      <View style={{ flexDirection: "column", gap: 4 }}>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "column",
+          gap: 4,
+          paddingRight: 8,
+        }}
+      >
         <Text style={{ fontSize: theme.fontSizes.md, fontWeight: "600" }}>
-          {appointment?.user}
+          Cliente: {appointment?.user}
+        </Text>
+        <Text
+          style={{
+            fontSize: theme.fontSizes.sm,
+            flexShrink: 1,
+          }}
+        >
+          Serviço: {appointment?.service}
         </Text>
         <Text style={{ fontSize: theme.fontSizes.sm }}>
-          {appointment?.service}
+          Data: {appointment?.scheduledAt}
         </Text>
         <Text style={{ fontSize: theme.fontSizes.sm }}>
-          {appointment?.scheduledAt}
+          Status:{" "}
+          <Text
+            style={{
+              color: appointmentsStatusColor(appointment?.status),
+              fontWeight: "600",
+            }}
+          >
+            {appointmentsStatus[appointment?.status]}
+          </Text>
         </Text>
       </View>
 
@@ -50,25 +90,28 @@ export function CardItem({
       >
         <TouchableOpacity
           style={{
-            backgroundColor: theme.colors.blue[500],
-            padding: 8,
+            backgroundColor: theme.colors.green[500],
+            padding: 12,
             borderRadius: 6,
           }}
+          onPress={() =>
+            handleUpdateAppointment({ appointmentId: appointment?.id })
+          }
         >
-          <Pencil color="#fff" size={18} />
+          <Check color="#fff" size={18} />
         </TouchableOpacity>
 
         <TouchableOpacity
           style={{
             backgroundColor: theme.colors.red[500],
-            padding: 8,
+            padding: 12,
             borderRadius: 6,
           }}
           onPress={() =>
             handleDeleteAppointment({ appointmentId: appointment?.id })
           }
         >
-          <Trash color="#fff" size={18} />
+          <X color="#fff" size={18} />
         </TouchableOpacity>
       </View>
     </View>
